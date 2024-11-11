@@ -1,0 +1,163 @@
+from pydantic import BaseModel
+from typing import List, Dict, Optional
+
+class EvaluationResult(BaseModel):
+    """Base class for individual evaluation results."""
+    score: float
+    comment: str
+
+class CaptureEvaluationResult(EvaluationResult):
+    """Result for capturing guideline compliance."""
+    pass
+
+class HallucinationEvaluationResult(EvaluationResult):
+    """Result for hallucination detection against context."""
+    pass
+
+class QualityEvaluationResult(EvaluationResult):
+    """Result for answer quality assessment."""
+    pass
+
+class AnswerEvaluation(BaseModel):
+    """Aggregate result containing all evaluation aspects."""
+    capture: CaptureEvaluationResult
+    hallucination: HallucinationEvaluationResult
+    quality: QualityEvaluationResult
+
+class DgenEvalWithLLM:
+    """Evaluator class that uses an LLM for scoring answers based on guidelines and context."""
+    
+    def __init__(self, guidelines: List[str], context: str, llm_api_key: Optional[str] = None, window_size: int = 3000, step_size: int = 1500):
+        self.guidelines = guidelines
+        self.context = context
+        self.llm_api_key = llm_api_key  # Set API key if required for LLM access
+        self.window_size = window_size  # Size of each context window (in characters)
+        self.step_size = step_size      # Step size for moving the window across the context
+
+    def evaluate_capture(self, answer: str) -> CaptureEvaluationResult:
+        """Evaluate if the answer captures information required by the guidelines."""
+        prompt = f"""
+        Given the following answer and guidelines, rate how well the answer captures the required information:
+        
+        Guidelines:
+        {self.guidelines}
+        
+        Answer:
+        {answer}
+        
+        Provide a score (0, 0.5, or 1) and a brief comment.
+        """
+        response = self.call_llm(prompt)
+        return CaptureEvaluationResult(score=response['score'], comment=response['comment'])
+
+    def evaluate_hallucinations(self, answer: str) -> HallucinationEvaluationResult:
+        """Evaluate if the answer contains any information not supported by the context using windowed search."""
+        
+        # Split the answer into sentences for detailed hallucination checks
+        sentences = answer.split(". ")
+        hallucinations = []
+
+        for sentence in sentences:
+            if not self.search_in_context(sentence):
+                hallucinations.append(sentence.strip())
+        
+        score = 1.0 if not hallucinations else 0.0
+        comment = "No hallucinations detected." if score == 1.0 else f"Hallucinations detected in sentences: {hallucinations}"
+        
+        return HallucinationEvaluationResult(score=score, comment=comment)
+
+    def search_in_context(self, sentence: str) -> bool:
+        """Windowed search to check if a sentence is present in the context."""
+        
+        # Iterate over the context using a sliding window approach
+        for i in range(0, len(self.context), self.step_size):
+            window = self.context[i:i + self.window_size]
+            if sentence in window:
+                return True
+        return False
+
+    def evaluate_quality(self, answer: str, question: str) -> QualityEvaluationResult:
+        """Evaluate the quality of the answer in terms of clarity, applicability, and relevance."""
+        prompt = f"""
+        Given the following question and answer, rate the answer's quality (clarity, applicability, relevance):
+        
+        Question:
+        {question}
+        
+        Answer:
+        {answer}
+        
+        Provide a score (0 or 1) and a brief comment.
+        """
+        response = self.call_llm(prompt)
+        return QualityEvaluationResult(score=response['score'], comment=response['comment'])
+
+    def call_llm(self, prompt: str) -> Dict[str, any]:
+        """Placeholder for LLM API call.
+        
+        Replace this function with an actual API call to your LLM provider.
+        """
+        if not self.llm_api_key:
+            raise ValueError("LLM API key is required to make calls to the LLM service.")
+
+        # Example for integrating with OpenAI API
+        # import openai
+        # openai.api_key = self.llm_api_key
+        # response = openai.Completion.create(
+        #     model="text-davinci-003",
+        #     prompt=prompt,
+        #     max_tokens=100
+        # )
+        # return self.parse_llm_response(response["choices"][0]["text"])
+
+        # Dummy response for demonstration
+        return {"score": 1.0, "comment": "Sample response from LLM."}
+
+    def parse_llm_response(self, response_text: str) -> Dict[str, any]:
+        """Parse LLM response text to extract score and comment.
+        
+        Adjust parsing logic based on the LLM response format.
+        """
+        # Implement logic to parse response text
+        # Example (assuming score and comment are split by delimiter):
+        # score_str, comment = response_text.split('|')
+        # score = float(score_str.strip())
+        # return {"score": score, "comment": comment.strip()}
+
+        # Dummy implementation for illustration
+        return {"score": 1.0, "comment": response_text}
+
+    def evaluate_answer(self, answer: str, question: str) -> AnswerEvaluation:
+        """Perform a complete evaluation of the answer, assessing capture, hallucination, and quality."""
+        capture_result = self.evaluate_capture(answer)
+        hallucination_result = self.evaluate_hallucinations(answer)
+        quality_result = self.evaluate_quality(answer, question)
+        
+        return AnswerEvaluation(
+            capture=capture_result,
+            hallucination=hallucination_result,
+            quality=quality_result
+        )
+
+# Example Usage
+guidelines = [
+    "Guideline 1: Ensure data security and compliance with MRM standards.",
+    "Guideline 2: Anomaly detection must be robust and easily explainable.",
+    "Guideline 3: Follow specific security protocols outlined in MRM."
+]
+context = """
+# Full Context Document
+This document represents the full context that the answer should reference, formatted as a large Markdown file...
+"""
+
+answer = """
+The model ensures data security in line with MRM guidelines, and it includes robust anomaly detection capabilities.
+However, additional security protocols might be required as per MRM guidelines.
+"""
+
+question = "Does this answer cover MRM requirements for data security and anomaly detection?"
+
+# Substitute 'your_llm_api_key' with an actual API key for LLM service
+evaluator = DgenEvalWithLLM(guidelines=guidelines, context=context, llm_api_key="your_llm_api_key")
+evaluation_result = evaluator.evaluate_answer(answer, question)
+print(evaluation_result.json(indent=2))
