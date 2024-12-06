@@ -46,17 +46,19 @@ evaluation_prompts:
         - **Comment**: Provide a concise explanation for your score, identifying any missing or insufficiently addressed requirements.
 
   - section: "4. Hallucination Rate"
-    description: "Assess whether the output contains fabricated or implausible information based on the provided question and guidelines."
+    description: "Evaluate whether the output contains information irrelevant to MRM requirements, question, or guidelines."
     prompt: |
       Evaluate the following output for hallucination:
       Question: {question}
       Guidelines: {guidelines}
       Output: {output}
+      MRM requirements are as follows:
+      - {requirements}
       Criteria:
-        - Does the output introduce information that is not explicitly supported by the question or guidelines?
-        - Is the output logically consistent and free from irrelevant or overly specific fabricated details?
+        - Does the output introduce information that is clearly irrelevant, fabricated, or unsupported by the question, guidelines, or MRM requirements?
+        - Assume the output may have leveraged general or project-specific context unless it explicitly contradicts MRM relevance.
       Provide:
         - **Score**:
-          - "1" if any part of the output includes fabricated, irrelevant, or unsupported content.
-          - "0" if the output is completely consistent with the question and guidelines.
-        - **Comment**: Provide a concise explanation for your score, identifying any fabricated or unsupported content and explaining why it is inconsistent with the given question or guidelines.
+          - "0" if the output plausibly aligns with the question, guidelines, or MRM requirements.
+          - "1" if the output demonstrably includes irrelevant, fabricated, or unsupported information that cannot be justified by any reasonable MRM context.
+        - **Comment**: Provide a concise explanation for your score, identifying specific content that is irrelevant or unsupported by the MRM requirements or question/guidelines.
