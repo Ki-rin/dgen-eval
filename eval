@@ -1,0 +1,110 @@
+import yaml
+from pydantic import BaseModel
+from typing import Dict
+import re
+from dgen_llm.llm_connector import generate_content
+
+# Define Evaluation Result Models
+class EvaluationResult(BaseModel):
+    """Base class for individual evaluation results."""
+    score: float
+    comment: str
+
+class CoherenceClarityResult(EvaluationResult):
+    """Result for coherence and clarity evaluation."""
+    pass
+
+class QualityEvaluationResult(EvaluationResult):
+    """Result for quality evaluation."""
+    pass
+
+class CaptureEvaluationResult(EvaluationResult):
+    """Result for capture rate evaluation."""
+    pass
+
+class HallucinationEvaluationResult(EvaluationResult):
+    """Result for hallucination detection."""
+    pass
+
+class AnswerEvaluation(BaseModel):
+    """Aggregate result containing all evaluation aspects."""
+    coherence_clarity: CoherenceClarityResult
+    quality: QualityEvaluationResult
+    capture: CaptureEvaluationResult
+    hallucination: HallucinationEvaluationResult
+
+# Load YAML Prompts
+def load_prompts(yaml_path: str) -> Dict[str, str]:
+    """Load evaluation prompts from the YAML file."""
+    with open(yaml_path, 'r') as file:
+        prompts = yaml.safe_load(file)
+    return {section['section']: section['prompt'] for section in prompts['evaluation_prompts']}
+
+# Evaluation Class
+class DgenEvalWithLLM:
+    """Evaluator class that uses an LLM for scoring answers based on guidelines and context."""
+    def __init__(self, context: str, prompts: Dict[str, str]):
+        self.context = context
+        self.prompts = prompts
+
+    def parse_llm_response(self, response_text: str) -> Dict[str, any]:
+        """Parse LLM response text to extract score and comment."""
+        match = re.search(r'\b(\d(\.\d+)?)\b', response_text)
+        score = float(match.group(1)) if match else 0.0
+        return {"score": score, "comment": response_text.strip()}
+
+    def evaluate_coherence_clarity(self, output: str) -> CoherenceClarityResult:
+        """Evaluate coherence and clarity."""
+        prompt = self.prompts["1. Coherence/Clarity"].format(output=output)
+        response = self.parse_llm_response(generate_content(prompt))
+        return CoherenceClarityResult(score=response['score'], comment=response['comment'])
+
+    def evaluate_quality(self, output: str, requirements: str) -> QualityEvaluationResult:
+        """Evaluate quality rate."""
+        prompt = self.prompts["2. Quality Rate"].format(output=output, requirements=requirements)
+        response = self.parse_llm_response(generate_content(prompt))
+        return QualityEvaluationResult(score=response['score'], comment=response['comment'])
+
+    def evaluate_capture(self, output: str, requirements: str) -> CaptureEvaluationResult:
+        """Evaluate capture rate."""
+        prompt = self.prompts["3. Capture Rate"].format(output=output, requirements=requirements)
+        response = self.parse_llm_response(generate_content(prompt))
+        return CaptureEvaluationResult(score=response['score'], comment=response['comment'])
+
+    def evaluate_hallucinations(self, output: str, requirements: str) -> HallucinationEvaluationResult:
+        """Evaluate hallucination rate."""
+        prompt = self.prompts["4. Hallucination Rate"].format(output=output, requirements=requirements)
+        response = self.parse_llm_response(generate_content(prompt))
+        return HallucinationEvaluationResult(score=response['score'], comment=response['comment'])
+
+    def evaluate_answer(self, output: str, requirements: str) -> AnswerEvaluation:
+        """Perform a complete evaluation of the output."""
+        coherence_clarity_result = self.evaluate_coherence_clarity(output)
+        quality_result = self.evaluate_quality(output, requirements)
+        capture_result = self.evaluate_capture(output, requirements)
+        hallucination_result = self.evaluate_hallucinations(output, requirements)
+
+        return AnswerEvaluation(
+            coherence_clarity=coherence_clarity_result,
+            quality=quality_result,
+            capture=capture_result,
+            hallucination=hallucination_result
+        )
+
+# Usage Example
+# Load prompts from YAML file
+yaml_path = "evaluation_prompts.yaml"  # Replace with the actual path to your YAML file
+prompts = load_prompts(yaml_path)
+
+# Initialize the evaluator with the context and prompts
+evaluator = DgenEvalWithLLM(context="Relevant evaluation context here", prompts=prompts)
+
+# Example output and requirements to evaluate
+example_output = "This is an example output to evaluate."
+example_requirements = "- Requirement 1\n- Requirement 2\n- Requirement 3"
+
+# Perform evaluation
+evaluation_results = evaluator.evaluate_answer(output=example_output, requirements=example_requirements)
+
+# Print results
+print(evaluation_results)
