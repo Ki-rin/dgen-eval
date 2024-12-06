@@ -80,3 +80,19 @@ if __name__ == "__main__":
 
     merged_output_file = "merged_eval_output.xlsx"
     merge_evaluation_files(output_folders, merged_output_file)
+---
+# Function to handle reading markdown files
+def read_markdown_and_process(markdown_file, eval_file):
+    try:
+        if not os.path.exists(markdown_file):
+            print(f"Markdown file not found: {markdown_file}")
+            return  # Skip processing if the file is missing
+
+        with open(markdown_file, "r", encoding="utf-8") as md_file:  # Use UTF-8 encoding
+            md_content = md_file.read()
+
+        match_answers(md_content, eval_file)
+        evaluate_answers(eval_file)
+
+    except Exception as e:
+        print(f"Error processing markdown file {markdown_file}: {e}")
