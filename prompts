@@ -37,7 +37,7 @@ evaluation_prompts:
       Output: {output}
       MRM requirements are as follows:
       - {requirements}
-      Criteria:
+      Criteria to evaluate the capture rate:
         - Identify the total number of requirements (req_total).
         - Identify the number of requirements met in the output (req_output).
         - Calculate Capture Rate as req_output / req_total.
@@ -46,16 +46,17 @@ evaluation_prompts:
         - **Comment**: Provide a concise explanation for your score, identifying any missing or insufficiently addressed requirements.
 
   - section: "4. Hallucination Rate"
-    description: "Assess whether the output contains fabricated or implausible information."
+    description: "Assess whether the output contains fabricated or implausible information based on the provided question and guidelines."
     prompt: |
       Evaluate the following output for hallucination:
+      Question: {question}
+      Guidelines: {guidelines}
       Output: {output}
-      MRM requirements are as follows (if applicable):
-      - {requirements}
       Criteria:
-        - Does the output include any fabricated, irrelevant, or implausible details that could not reasonably be inferred based on the MRM requirements or context?
+        - Does the output introduce information that is not explicitly supported by the question or guidelines?
+        - Is the output logically consistent and free from irrelevant or overly specific fabricated details?
       Provide:
         - **Score**:
-          - "1" if hallucinated content is present.
-          - "0" if no hallucination is detected.
-        - **Comment**: Provide a concise explanation for your score, specifying hallucinated content if present and its divergence from the MRM requirements.
+          - "1" if any part of the output includes fabricated, irrelevant, or unsupported content.
+          - "0" if the output is completely consistent with the question and guidelines.
+        - **Comment**: Provide a concise explanation for your score, identifying any fabricated or unsupported content and explaining why it is inconsistent with the given question or guidelines.
