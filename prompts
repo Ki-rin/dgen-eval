@@ -1,3 +1,38 @@
+f"Extract a short list of key requirements that the Model Risk Management Validator " 
+f"expects in the {section_cell.value} section of the low-risk model documentation, " 
+f"focusing on the sub-sub-section written by the developer about {question_cell.value}."
+----
+
+section: "4. Hallucination Rate"
+description: "Evaluate if the output includes fabricated or irrelevant information unrelated to the question or MRM requirements."
+prompt: |
+  Evaluate the output for hallucination based on the question and MRM requirements.
+
+  **Output:** {output}  
+  **Question:** {question}
+
+  Assume the output was generated using context not provided here. Your task is to detect:
+  - Fabricated information.
+  - Information unrelated to the question or MRM requirements.
+  - Contradictions or details that cannot align with the question.
+
+  **MRM Requirements:**  
+  - {requirements}
+
+  **Evaluation Criteria:**
+  - Does the output include information that is fabricated or unrelated to the question or MRM requirements?
+  - Does the output include contradictions or details that cannot logically align with the question?
+
+  **Provide:**
+  - **Score:**
+    - "0" if the output aligns with the question and MRM requirements, assuming reasonable context.
+    - "1" if the output includes hallucinations (e.g., fabricated, irrelevant, or incorrect details).
+  - **Comment:** Briefly explain the score, pointing out any hallucinations.
+
+  Note: Focus only on clear and major issues. Ignore minor inaccuracies.
+
+
+
 evaluation_prompts:
   - section: "1. Coherence/Clarity"
     description: "Evaluate if the output is clear, easy to understand, and maintains a logical flow."
