@@ -2,8 +2,34 @@ f"Extract a short list of key requirements that the Model Risk Management Valida
 f"expects in the {section_cell.value} section of the low-risk model documentation, " 
 f"focusing on the sub-sub-section written by the developer about {question_cell.value}."
 ----
+prompt: |
+  Evaluate the output for hallucination based on the question below, marked between triple exclamation marks (!!!):
 
+  **Output:** {output}  
+  **Question:** !!! {question} !!!
 
+  Assume the output was generated using additional context that is NOT provided here. Your task is to detect only clear and extreme hallucinations, where the output strays far from the subject of the question. Specifically, look for:
+  - Topics that are entirely unrelated to the question's domain (e.g., the output discusses celebrities or unrelated entertainment topics when the question is about MRM requirements).
+  - Information that has no logical connection to the question, even with missing context.
+  - Statements or references that introduce content completely irrelevant to the domain of model risk management, systems, or related applications.
+
+  **Evaluation Criteria:**
+  - Does the output introduce topics that are clearly and significantly unrelated to the question's domain or subject?
+  - Are there references or statements that are far outside the expected scope of the question, such as introducing concepts from unrelated fields like pop culture or sports?
+  - Do NOT penalize content that could plausibly relate to the question, such as references to Citi, LLMs, or applications, as long as it aligns broadly with the question's domain.
+
+  **Provide:**
+  - **Score:**
+    - "0" if the output stays within the broad domain of the question, even if it includes references that depend on missing context.
+    - "1" if the output includes extreme hallucinations, such as introducing clearly unrelated or off-topic information.
+  - **Comment:** Provide a brief explanation for the score, highlighting any examples of unrelated or far-off-topic content in the output.
+
+  **Important Notes:**
+  - Only flag hallucinations if the output clearly and significantly deviates from the question's domain or subject.
+  - Do NOT flag related references, even if tangential, as long as they align with the broader scope of the question.
+  - Focus on detecting extreme topic shifts or irrelevant content that has no logical connection to the question.
+
+---
 
 evaluation_prompts:
   - section: "1. Coherence/Clarity"
