@@ -1,0 +1,27 @@
+- section: "Model Development"
+  prompt: |
+    Provide an overview of the model development process.
+
+- section: "3.1. Model Architecture"
+  prompt: |
+    Describe the model architecture and technical details:
+    - What type of model is used?
+    - Why was this architecture chosen?
+    - What are the key hyperparameters?
+    - How was the architecture validated?
+
+- section: "3.2. Training Methodology"
+  prompt: |
+    Explain the training methodology:
+    - What training approach was used?
+    - How was the data split for training/validation/testing?
+    - What optimization techniques were employed?
+    - What stopping criteria were used?
+
+- section: "3.3. Model Evaluation"
+  prompt: |
+    Detail the model evaluation process:
+    - What metrics were used to evaluate the model?
+    - How was model performance assessed across different segments?
+    - What benchmarks or alternatives were considered?
+    - How was fairness evaluated?

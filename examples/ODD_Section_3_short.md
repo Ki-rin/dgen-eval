@@ -1,0 +1,72 @@
+# ODD Documentation
+
+## Model Development
+
+Our ticket classification system employs a hybrid approach combining natural language processing and traditional machine learning techniques to achieve high accuracy across diverse ticket types.
+
+## 3.1. Model Architecture
+
+The classification system employs a two-stage architecture:
+
+1. **Stage 1: Text Embedding Generation**
+
+   - Fine-tuned BERT model (bert-base-uncased)
+   - Custom layers trained on our support ticket corpus
+   - Output: 768-dimensional contextual embeddings
+
+2. **Stage 2: Multi-class Classification**
+   - Gradient Boosting Decision Tree (XGBoost)
+   - Hyperparameters:
+     - max_depth: 6
+     - learning_rate: 0.1
+     - n_estimators: 200
+     - subsample: 0.8
+     - colsample_bytree: 0.8
+
+This hybrid architecture was selected after benchmarking against several alternatives:
+
+- Pure transformer-based approach (BERT with classification head)
+- Traditional ML with TF-IDF features
+- Ensemble methods with various feature combinations
+
+The hybrid approach outperformed alternatives by approximately 8% in overall accuracy and 12% in F1-score for minority classes, while maintaining acceptable inference latency (avg. 120ms per ticket).
+
+## 3.2. Training Methodology
+
+The model was trained using the following methodology:
+
+1. **Data Splitting**:
+
+   - 70% training set
+   - 15% validation set
+   - 15% test set
+   - Stratified splitting to maintain class distribution
+
+2. **Training Process**:
+
+   - BERT component: Fine-tuned for 3 epochs with learning rate 2e-5
+   - XGBoost component: Trained on BERT embeddings + metadata
+   - Early stopping based on validation loss (patience: 5 epochs)
+   - Learning rate scheduling with cosine decay
+
+3. **Regularization Techniques**:
+
+   - Dropout (rate: 0.2) in BERT layers
+   - L2 regularization in XGBoost (lambda: 1.0)
+   - Class weights adjusted for imbalanced classes
+
+4. **Infrastructure**:
+   - Training performed on 4x NVIDIA A100 GPUs
+   - Distributed training using Horovod
+   - Mixed precision training (FP16) for efficiency
+
+The training process was logged using MLflow, with all hyperparameters, metrics, and model artifacts stored for reproducibility and compliance purposes.
+
+## 3.3. Model Evaluation
+
+The model was evaluated using a comprehensive set of metrics:
+
+1. **Classification Performance**:
+   - Accuracy: 92.3% overall
+   - Precision: 89.7% (macro), 94.1% (weighted)
+   - Recall: 87.2% (macro), 92.3%

@@ -1,0 +1,65 @@
+evaluation_prompts:
+  - section: "1. Coherence/Clarity"
+    description: "Evaluate if the output is clear, easy to understand, and maintains a logical flow."
+    prompt: |
+      Evaluate the following output for coherence and clarity:
+      Output: {output}
+      Criteria:
+        - Does the output maintain a clear logical flow?
+        - Is it easy to understand?
+        - Does it avoid contradictions?
+        - Is terminology used consistently?
+      Provide:
+        - **Score**: A number between 0.0 and 1.0 where:
+          - 1.0: Perfectly clear and coherent
+          - 0.5: Somewhat clear but with issues
+          - 0.0: Unclear and incoherent
+        - **Comment**: A brief explanation for your score with specific examples.
+
+  - section: "2. Quality Rate"
+    description: "Evaluate the quality and usefulness of the content."
+    prompt: |
+      Evaluate the following output for quality and completeness:
+      Output: {output}
+      Requirements: {requirements}
+      Criteria:
+        - Does the output address all the requirements?
+        - Is the information accurate and relevant?
+        - Is the content sufficiently detailed?
+        - Is it concise without unnecessary elaboration?
+      Provide:
+        - **Score**: A number between 0.0 and 1.0 where:
+          - 1.0: High quality, meets all requirements
+          - 0.5: Moderate quality, meets some requirements
+          - 0.0: Low quality, fails to meet requirements
+        - **Comment**: A brief explanation with specific examples.
+
+  - section: "3. Capture Rate"
+    description: "Calculate the percentage of key items included in the output."
+    prompt: |
+      Evaluate the capture rate for the following output:
+      Output: {output}
+      Requirements: {requirements}
+      Criteria:
+        - Identify all key requirements in the criteria
+        - Calculate what percentage of them are addressed in the output
+      Provide:
+        - **Score**: A decimal between 0.0 and 1.0 representing the capture rate
+        - **Comment**: List which requirements were captured and which were missed
+
+  - section: "4. Hallucination Rate"
+    description: "Evaluate whether the output contains fabricated information."
+    prompt: |
+      Evaluate the following output for hallucinations:
+      Output: {output}
+      Requirements: {requirements}
+      Criteria:
+        - Does the output contain information that contradicts the requirements?
+        - Does it introduce irrelevant or fabricated information?
+        - Are there any unsubstantiated claims?
+      Provide:
+        - **Score**: A number between 0.0 and 1.0 where:
+          - 0.0: No hallucinations detected
+          - 0.5: Some minor hallucinations
+          - 1.0: Major hallucinations throughout
+        - **Comment**: Identify specific hallucinations if any.
