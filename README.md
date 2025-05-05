@@ -238,3 +238,132 @@ If you need to use a different LLM provider:
 - **LLM API Issues**: Check the adapter logs and retry logic
 - **Low Scores**: Review the generated requirements for clarity and specificity
 - **Performance Issues**: Adjust max_workers and batch processing parameters
+
+# Documentation Evaluation Dashboard
+
+A Streamlit-based dashboard for visualizing and analyzing documentation evaluation results from the Modular Documentation Evaluation System.
+
+## Overview
+
+This project extends the Modular Documentation Evaluation System with a user-friendly dashboard that helps visualize, navigate, and analyze documentation evaluation results. The dashboard provides:
+
+- An overview of evaluation metrics across all documentation sections
+- Detailed views of individual section evaluations
+- Interactive visualizations of evaluation results
+- Easy navigation between documentation sections
+- Identification of areas for improvement
+
+## Installation
+
+1. Clone this repository:
+
+   ```bash
+   git clone <repository-url>
+   cd documentation-evaluation-dashboard
+   ```
+
+2. Create a virtual environment and install dependencies:
+
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. Initialize the environment (creates necessary directories and sample data if needed):
+   ```bash
+   python init_eval_environment.py
+   ```
+
+## Usage
+
+### Running the Dashboard
+
+Use the provided script to run the dashboard:
+
+```bash
+./run_dashboard.sh
+```
+
+Or run it directly with Streamlit:
+
+```bash
+streamlit run app.py
+```
+
+The dashboard will be available at http://localhost:8501 in your web browser.
+
+### Dashboard Features
+
+The dashboard has two main views:
+
+1. **Dashboard View** - Shows summary statistics and visualizations across all sections:
+
+   - Overview of average scores for each metric
+   - Overall documentation score
+   - Comparison charts for all metrics
+   - Heatmap comparing sections across metrics
+   - Areas for improvement
+
+2. **Section Details View** - Shows detailed information for each section:
+   - Original documentation content
+   - Requirements for the section
+   - Evaluation results with scores and comments for each metric
+
+### Running Evaluations
+
+To generate actual evaluation results (instead of sample data):
+
+1. Configure your evaluation parameters in `evaluation_config.yaml` or use command-line options.
+2. Run the evaluation tool:
+
+   ```bash
+   python cli.py --yaml-dir ./config --md-dir ./examples --output-dir ./evaluation_results
+   ```
+
+3. Refresh the dashboard to see the new results.
+
+## Project Structure
+
+```
+doc_evaluator/
+├── app.py                       # Main Streamlit application
+├── dashboard.py                 # Dashboard visualization components
+├── cli.py                       # Command-line interface
+├── init_eval_environment.py     # Environment initialization script
+├── run_dashboard.sh             # Dashboard runner script
+├── core/                        # Core functionality
+├── evaluators/                  # Documentation evaluators
+├── llm/                         # LLM integration components
+├── pipeline/                    # Evaluation pipeline
+├── config/                      # Configuration files
+├── examples/                    # Example documentation files
+└── evaluation_results/          # Evaluation results
+```
+
+## Customization
+
+### Changing Evaluation Metrics
+
+To modify the evaluation metrics:
+
+1. Update `core/data_models.py` with new metrics
+2. Add corresponding methods to the evaluator classes
+3. Update prompts in `llm/prompts.py` or `config/prompts.yaml`
+4. Update the dashboard visualizations in `dashboard.py`
+
+### Adding New Documentation Sections
+
+To add new documentation sections:
+
+1. Add Markdown files to the `examples/` directory
+2. Add corresponding YAML files to the `config/` directory
+3. Run the evaluation pipeline to generate results
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

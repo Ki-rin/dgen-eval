@@ -1,0 +1,33 @@
+# Evaluation Configuration
+
+# Directory paths
+yaml_dir: "./config"
+md_dir: "./examples"
+output_dir: "./evaluation_results"
+prompt_file: "./config/prompts.yaml"
+
+# Section range to evaluate (inclusive)
+section_range: "1-3"
+
+# LLM model parameters
+model_params:
+  temperature: 0.0
+  max_workers: 4
+  # model: "your-model-name"  # Uncomment and set if needed
+
+# Dashboard settings
+dashboard:
+  # Page title
+  title: "Documentation Evaluation Dashboard"
+
+  # Color scheme (scores)
+  colors:
+    good: "#28a745" # Green
+    medium: "#ffc107" # Yellow
+    poor: "#dc3545" # Red
+
+  # Score thresholds
+  thresholds:
+    high: 0.8 # Scores above this are considered good
+    medium: 0.6 # Scores above this are considered acceptable
+    low: 0.4 # Scores below this are considered poor

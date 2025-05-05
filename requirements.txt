@@ -2,3 +2,6 @@ pandas
 pydantic
 pyyaml
 regex
+streamlit
+matplotlib
+altair
