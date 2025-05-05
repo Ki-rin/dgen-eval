@@ -1,0 +1,19 @@
+- section: "Object Scope, Purpose, and Use"
+  prompt: |
+    Describe the overall scope, purpose, and intended use of the AI component or module.
+
+- section: "1.1. Objectives and Business Purpose"
+  prompt: |
+    Describe the objectives and business purpose of the AI component or module.
+    Evaluate and justify the applicability of the selected AI/ML approach against business objectives and the use of the AI component. 
+    Specifically, consider the following:
+      - The AI component needs to generate adverse action reasons.
+      - Certain business drivers (inputs) are expected to have specific functional relationships with the output, such as a variable's key role in clustering.
+      - The output is subject to fairness concerns (e.g., Fair Lending).
+      - The business use case is subject to system or data limitations.
+      - The AI component's use has a large customer/client/employee base or a significant impact on customers/clients/employees.
+
+- section: "1.2. Business Scope of the Object, Product/ Portfolio Description"
+  prompt: |
+    Provide an overview of the product, portfolio, or population to which the AI component will be applied.
+    Include any regulatory, self-identified, audit, or other issues, including Corrective Action Plans (CAPs), to which the AI component is subject.

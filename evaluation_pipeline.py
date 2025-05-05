@@ -11,7 +11,7 @@ output_folders = ["../tests/"]
 def process_section(section_no, output_folders):
     try:
         # Stage 1: Create Excel file from YAML
-        yaml_file = f"C:\\dgen-prompts\\dgen_prompts\\default\\odd\\section_{section_no}.yaml"
+        yaml_file = f"odd_{section_no}.yaml"
         with open(yaml_file, "r", encoding="utf-8") as yf:  # Use UTF-8 encoding
             yaml_data = yaml.safe_load(yf)
 
