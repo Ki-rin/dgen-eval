@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  doc-evaluator-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: doc-evaluator-dashboard:latest
+    container_name: doc-evaluator-dashboard
+    ports:
+      - "8080:8080"  # Streamlit web interface
+      - "8081:8081"  # Health check endpoint
+    environment:
+      - STREAMLIT_SERVER_PORT=8080
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=false
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - HEALTH_CHECK_PORT=8081
+    volumes:
+      - ./config:/app/config
+      - ./examples:/app/examples
+      - ./evaluation_results:/app/evaluation_results
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped

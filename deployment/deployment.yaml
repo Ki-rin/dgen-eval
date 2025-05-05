@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-evaluator-dashboard
+  labels:
+    app: doc-evaluator-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doc-evaluator-dashboard
+  template:
+    metadata:
+      labels:
+        app: doc-evaluator-dashboard
+    spec:
+      containers:
+        - name: doc-evaluator-dashboard
+          image: ${IMAGE_REPOSITORY}/doc-evaluator-dashboard:latest
+          ports:
+            - containerPort: 8080
+              name: web
+            - containerPort: 8081
+              name: health
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          env:
+            - name: STREAMLIT_SERVER_PORT
+              value: "8080"
+            - name: STREAMLIT_SERVER_HEADLESS
+              value: "true"
+            - name: STREAMLIT_SERVER_ENABLE_CORS
+              value: "false"
+            - name: STREAMLIT_SERVER_ADDRESS
+              value: "0.0.0.0"
+            - name: HEALTH_CHECK_PORT
+              value: "8081"
+            - name: GENERATE_SAMPLE_DATA
+              value: "false"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+            - name: examples-volume
+              mountPath: /app/examples
+            - name: results-volume
+              mountPath: /app/evaluation_results
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: doc-evaluator-config-pvc
+        - name: examples-volume
+          persistentVolumeClaim:
+            claimName: doc-evaluator-examples-pvc
+        - name: results-volume
+          persistentVolumeClaim:
+            claimName: doc-evaluator-results-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doc-evaluator-dashboard
+  labels:
+    app: doc-evaluator-dashboard
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: doc-evaluator-dashboard
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: doc-evaluator-dashboard
+  labels:
+    app: doc-evaluator-dashboard
+spec:
+  to:
+    kind: Service
+    name: doc-evaluator-dashboard
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
