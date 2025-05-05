@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doc-evaluator"
+dynamic = ["version"]
+description = "Modular Documentation Evaluation Dashboard"
+readme = "README.md"
+authors = [
+    {name = "Your Organization", email = "your.email@example.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+]
+keywords = ["documentation", "evaluation", "dashboard", "nlp", "llm"]
+requires-python = ">=3.8"
+dependencies = [
+    "pandas",
+    "pydantic",
+    "pyyaml",
+    "regex",
+    "streamlit>=1.22.0",
+    "matplotlib",
+    "altair",
+    "requests",
+]
+
+[project.urls]
+Documentation = "https://github.com/your-org/doc-evaluator"
+Source = "https://github.com/your-org/doc-evaluator"
+Tracker = "https://github.com/your-org/doc-evaluator/issues"
+
+[project.scripts]
+doc-evaluator-cli = "doc_evaluator.cli:main"
+doc-evaluator-dashboard = "doc_evaluator.app:main"
+doc-evaluator-init = "doc_evaluator.init_eval_environment:main"
+
+[tool.setuptools]
+packages = ["doc_evaluator"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "doc_evaluator.__version__"}
+
+[tool.setuptools.package-data]
+"doc_evaluator" = [
+    "config/*.yaml",
+    "examples/*.md",
+]
