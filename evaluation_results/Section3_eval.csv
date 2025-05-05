@@ -1,14 +1,11 @@
-Section,Question,Requirements,Answer,Coherence/Clarity Score,Quality Score,Capture Rate,Hallucination Score
-Model Development,"Provide an overview of the model development process.
-","Provide clear information about Model Development
-Address all aspects mentioned in the question",Our ticket classification system employs a hybrid approach combining natural language processing and traditional machine learning techniques to achieve high accuracy across diverse ticket types.,0.85,0.85,0.85,0.85
-3.1. Model Architecture,"Describe the model architecture and technical details:
-- What type of model is used?
-- Why was this architecture chosen?
-- What are the key hyperparameters?
-- How was the architecture validated?
-","Provide clear information about 3.1. Model Architecture
-Address all aspects mentioned in the question","The classification system employs a two-stage architecture:
+Section ID,Section Title,Content,Requirements,Coherence Score,Quality Score,Capture Rate,Hallucination Score,Coherence Comment,Quality Comment,Capture Comment,Hallucination Comment,Average Score
+section_1,Model Development,Our ticket classification system employs a hybrid approach combining natural language processing and traditional machine learning techniques to achieve high accuracy across diverse ticket types.,"Provide an overview of the model development process.
+",0.75,0.75,0.75,0.75,"Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.",0.75
+section_2,3.1. Model Architecture,"The classification system employs a two-stage architecture:
 
 1. **Stage 1: Text Embedding Generation**
 
@@ -31,14 +28,17 @@ This hybrid architecture was selected after benchmarking against several alterna
 - Traditional ML with TF-IDF features
 - Ensemble methods with various feature combinations
 
-The hybrid approach outperformed alternatives by approximately 8% in overall accuracy and 12% in F1-score for minority classes, while maintaining acceptable inference latency (avg. 120ms per ticket).",0.85,0.85,0.85,0.85
-3.2. Training Methodology,"Explain the training methodology:
-- What training approach was used?
-- How was the data split for training/validation/testing?
-- What optimization techniques were employed?
-- What stopping criteria were used?
-","Provide clear information about 3.2. Training Methodology
-Address all aspects mentioned in the question","The model was trained using the following methodology:
+The hybrid approach outperformed alternatives by approximately 8% in overall accuracy and 12% in F1-score for minority classes, while maintaining acceptable inference latency (avg. 120ms per ticket).","Describe the model architecture and technical details:
+- What type of model is used?
+- Why was this architecture chosen?
+- What are the key hyperparameters?
+- How was the architecture validated?
+",0.75,0.75,0.75,0.75,"Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.",0.75
+section_3,3.2. Training Methodology,"The model was trained using the following methodology:
 
 1. **Data Splitting**:
 
@@ -65,16 +65,28 @@ Address all aspects mentioned in the question","The model was trained using the 
    - Distributed training using Horovod
    - Mixed precision training (FP16) for efficiency
 
-The training process was logged using MLflow, with all hyperparameters, metrics, and model artifacts stored for reproducibility and compliance purposes.",0.85,0.85,0.85,0.85
-3.3. Model Evaluation,"Detail the model evaluation process:
-- What metrics were used to evaluate the model?
-- How was model performance assessed across different segments?
-- What benchmarks or alternatives were considered?
-- How was fairness evaluated?
-","Provide clear information about 3.3. Model Evaluation
-Address all aspects mentioned in the question","The model was evaluated using a comprehensive set of metrics:
+The training process was logged using MLflow, with all hyperparameters, metrics, and model artifacts stored for reproducibility and compliance purposes.","Explain the training methodology:
+- What training approach was used?
+- How was the data split for training/validation/testing?
+- What optimization techniques were employed?
+- What stopping criteria were used?
+",0.75,0.75,0.75,0.75,"Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.",0.75
+section_4,3.3. Model Evaluation,"The model was evaluated using a comprehensive set of metrics:
 
 1. **Classification Performance**:
    - Accuracy: 92.3% overall
    - Precision: 89.7% (macro), 94.1% (weighted)
-   - Recall: 87.2% (macro), 92.3%",0.85,0.85,0.85,0.85
+   - Recall: 87.2% (macro), 92.3%","Detail the model evaluation process:
+- What metrics were used to evaluate the model?
+- How was model performance assessed across different segments?
+- What benchmarks or alternatives were considered?
+- How was fairness evaluated?
+",0.75,0.75,0.75,0.75,"Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.","Score: 0.75
+This content shows reasonable coherence and quality.",0.75
