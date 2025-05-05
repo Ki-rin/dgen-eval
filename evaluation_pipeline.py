@@ -37,8 +37,8 @@ class AnswerEvaluation(BaseModel):
     hallucination: HallucinationEvaluationResult
 
 # Utility Functions
-def yaml_to_excel(yaml_data: dict, excel_file: str) -> None:
-    """Convert YAML data to an Excel file with proper structure."""
+def yaml_to_csv(yaml_data: dict, csv_file: str) -> None:
+    """Convert YAML data to a CSV file with proper structure."""
     # Create DataFrame from YAML data
     rows = []
     for item in yaml_data:
@@ -56,13 +56,13 @@ def yaml_to_excel(yaml_data: dict, excel_file: str) -> None:
         })
     
     df = pd.DataFrame(rows)
-    df.to_excel(excel_file, index=False)
-    print(f"Excel file created: {excel_file}")
+    df.to_csv(csv_file, index=False)
+    print(f"CSV file created: {csv_file}")
 
-def generate_guidelines(excel_file: str) -> None:
-    """Generate guidelines for each question in the Excel file."""
+def generate_guidelines(csv_file: str) -> None:
+    """Generate guidelines for each question in the CSV file."""
     try:
-        df = pd.read_excel(excel_file)
+        df = pd.read_csv(csv_file)
         # For each row, generate requirements based on the question
         for idx, row in df.iterrows():
             question = row['Question']
@@ -74,18 +74,18 @@ def generate_guidelines(excel_file: str) -> None:
                 f"Address all aspects mentioned in the question"
             ]
             
-            # Update the Excel file with requirements
+            # Update the CSV file with requirements
             df.at[idx, 'Requirements'] = "\n".join(requirements)
         
-        df.to_excel(excel_file, index=False)
-        print(f"Guidelines generated for {excel_file}")
+        df.to_csv(csv_file, index=False)
+        print(f"Guidelines generated for {csv_file}")
     except Exception as e:
         print(f"Error generating guidelines: {e}")
 
-def match_answers(md_content: str, excel_file: str) -> None:
-    """Extract answers from markdown file and match them to questions in Excel."""
+def match_answers(md_content: str, csv_file: str) -> None:
+    """Extract answers from markdown file and match them to questions in CSV."""
     try:
-        df = pd.read_excel(excel_file)
+        df = pd.read_csv(csv_file)
         
         # Extract sections and their content from markdown
         section_pattern = r"## (.+?)\n(.*?)(?=\n## |\Z)"
@@ -97,7 +97,7 @@ def match_answers(md_content: str, excel_file: str) -> None:
             content = match.group(2).strip()
             section_content[section_title] = content
         
-        # Match sections to questions in the Excel file
+        # Match sections to questions in the CSV file
         for idx, row in df.iterrows():
             section = row['Section']
             if section in section_content:
@@ -109,8 +109,8 @@ def match_answers(md_content: str, excel_file: str) -> None:
                         df.at[idx, 'Answer'] = content
                         break
         
-        df.to_excel(excel_file, index=False)
-        print(f"Answers matched in {excel_file}")
+        df.to_csv(csv_file, index=False)
+        print(f"Answers matched in {csv_file}")
     except Exception as e:
         print(f"Error matching answers: {e}")
 
@@ -127,6 +127,16 @@ def load_prompts(yaml_path: str) -> Dict[str, str]:
             return {}
     except Exception as e:
         print(f"Error loading prompts: {e}")
+        return {}
+
+# Helper function to load YAML files
+def load_yaml_file(file_path: str) -> dict:
+    """Load a YAML file."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return yaml.safe_load(file)
+    except Exception as e:
+        print(f"Error loading YAML file {file_path}: {e}")
         return {}
 
 # LLM Connector (Placeholder)
@@ -198,11 +208,10 @@ class DgenEvalWithLLM:
             hallucination=hallucination_result
         )
 
-def evaluate_answers(excel_file: str):
-    """Evaluate answers in the Excel file using the DgenEvalWithLLM class."""
+def evaluate_answers(csv_file: str, prompts_path: str = "evaluation_prompts.yaml"):
+    """Evaluate answers in the CSV file using the DgenEvalWithLLM class."""
     try:
         # Load evaluation prompts
-        prompts_path = "evaluation_prompts.yaml"  # Adjust path as needed
         prompts = load_prompts(prompts_path)
         
         if not prompts:
@@ -218,37 +227,37 @@ def evaluate_answers(excel_file: str):
         # Create evaluator
         evaluator = DgenEvalWithLLM(context="", prompts=prompts)
         
-        # Load Excel file
-        df = pd.read_excel(excel_file)
+        # Load CSV file
+        df = pd.read_csv(csv_file)
         
         # Evaluate each answer
         for idx, row in df.iterrows():
             answer = row['Answer']
             requirements = row['Requirements']
             
-            if not answer or pd.isna(answer):
+            if pd.isna(answer) or not answer:
                 continue
                 
             # Evaluate answer
             evaluation = evaluator.evaluate_answer(answer, requirements)
             
-            # Update Excel with evaluation results
+            # Update CSV with evaluation results
             df.at[idx, 'Coherence/Clarity Score'] = evaluation.coherence_clarity.score
             df.at[idx, 'Quality Score'] = evaluation.quality.score
             df.at[idx, 'Capture Rate'] = evaluation.capture.score
             df.at[idx, 'Hallucination Score'] = evaluation.hallucination.score
         
-        # Save updated Excel file
-        df.to_excel(excel_file, index=False)
-        print(f"Answers evaluated in {excel_file}")
+        # Save updated CSV file
+        df.to_csv(csv_file, index=False)
+        print(f"Answers evaluated in {csv_file}")
     except Exception as e:
         print(f"Error evaluating answers: {e}")
 
 # Function to process a single section
-def process_section(section_no, output_folders):
+def process_section(section_no, yaml_dir, md_dir, output_dir, prompt_file):
     try:
-        # Stage 1: Create Excel file from YAML
-        yaml_file = f"odd_{section_no}.yaml"
+        # Stage 1: Create CSV file from YAML
+        yaml_file = os.path.join(yaml_dir, f"odd{section_no}.yaml")
         
         if not os.path.exists(yaml_file):
             print(f"YAML file not found: {yaml_file}")
@@ -257,71 +266,90 @@ def process_section(section_no, output_folders):
         with open(yaml_file, "r", encoding="utf-8") as yf:
             yaml_data = yaml.safe_load(yf)
 
-        excel_file = f"Section{section_no}_questions_and_guidelines.xlsx"
-        yaml_to_excel(yaml_data, excel_file=excel_file)
+        # Make sure output directory exists
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Create CSV file path
+        csv_file = os.path.join(output_dir, f"Section{section_no}_questions_and_guidelines.csv")
+        yaml_to_csv(yaml_data, csv_file=csv_file)
 
         # Generate guidelines
-        generate_guidelines(excel_file)
+        generate_guidelines(csv_file)
 
         # Stage 2: Include answers and append with calculated metrics
-        for output_folder in output_folders:
-            if not os.path.exists(output_folder):
-                os.makedirs(output_folder)
-                
-            q_file = excel_file
-            eval_file = os.path.join(output_folder, f"Section{section_no}_eval.xlsx")
-            shutil.copyfile(q_file, eval_file)
+        q_file = csv_file
+        eval_file = os.path.join(output_dir, f"Section{section_no}_eval.csv")
+        shutil.copyfile(q_file, eval_file)
 
-            markdown_file = os.path.join(output_folder, f"ODD_Section_{section_no}_short.md")
+        markdown_file = os.path.join(md_dir, f"ODD_Section_{section_no}_short.md")
+        
+        if not os.path.exists(markdown_file):
+            print(f"Markdown file not found: {markdown_file}")
+            return
             
-            if not os.path.exists(markdown_file):
-                print(f"Markdown file not found: {markdown_file}")
-                continue
-                
-            # Process markdown file and evaluate answers
-            with open(markdown_file, "r", encoding="utf-8") as md_file:
-                md_content = md_file.read()
-                
-            match_answers(md_content, eval_file)
-            evaluate_answers(eval_file)
+        # Process markdown file and evaluate answers
+        with open(markdown_file, "r", encoding="utf-8") as md_file:
+            md_content = md_file.read()
+            
+        match_answers(md_content, eval_file)
+        evaluate_answers(eval_file, prompt_file)
 
     except Exception as e:
         print(f"Error processing Section {section_no}: {e}")
 
-# Function to merge evaluation files into a single Excel file
-def merge_evaluation_files(output_folders, merged_output_file):
+# Function to merge evaluation files into a single CSV file
+def merge_evaluation_files(output_dir, merged_output_file):
     merged_data = []
 
-    for output_folder in output_folders:
-        for section_no in range(1, 6):
-            eval_file = os.path.join(output_folder, f"Section{section_no}_eval.xlsx")
-            if os.path.exists(eval_file):
-                try:
-                    df = pd.read_excel(eval_file)
-                    df.insert(0, "Section #", section_no)
-                    df.insert(1, "Output Folder", output_folder)
-                    merged_data.append(df)
-                except Exception as e:
-                    print(f"Error reading {eval_file}: {e}")
+    for section_no in range(1, 6):
+        eval_file = os.path.join(output_dir, f"Section{section_no}_eval.csv")
+        if os.path.exists(eval_file):
+            try:
+                df = pd.read_csv(eval_file)
+                df.insert(0, "Section #", section_no)
+                merged_data.append(df)
+            except Exception as e:
+                print(f"Error reading {eval_file}: {e}")
 
     if merged_data:
         try:
             merged_df = pd.concat(merged_data, ignore_index=True)
-            merged_df.to_excel(merged_output_file, index=False)
+            merged_df.to_csv(merged_output_file, index=False)
             print(f"Merged data saved to {merged_output_file}")
         except Exception as e:
             print(f"Error saving merged file: {e}")
     else:
         print("No evaluation files found to merge.")
 
-# Main execution
-if __name__ == "__main__":
-    output_folders = ["../tests/"]
+# Main pipeline function
+def run_evaluation_pipeline(yaml_dir="./config", md_dir="./examples", output_dir="./evaluation_results", 
+                           prompt_file="./config/prompts.yaml", section_range=(1, 6)):
+    """
+    Run the complete evaluation pipeline.
+    
+    Args:
+        yaml_dir: Directory containing YAML question files
+        md_dir: Directory containing markdown documentation files
+        output_dir: Directory for saving evaluation results
+        prompt_file: Path to the evaluation prompts YAML file
+        section_range: Tuple of (start, end+1) section numbers to evaluate
+    """
+    # Create output directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     
     # Process each section
-    for section_no in range(1, 6):
-        process_section(section_no, output_folders)
-
+    for section_no in range(section_range[0], section_range[1]):
+        process_section(section_no, yaml_dir, md_dir, output_dir, prompt_file)
+    
     # Merge all evaluation files
-    merged_output_file = "merged_eval_output.xlsx"
-    merge_evaluation_files(output_folders, merged_output_file)
+    merged_output_file = os.path.join(output_dir, "merged_evaluation.csv")
+    merge_evaluation_files(output_dir, merged_output_file)
+    
+    print(f"Evaluation pipeline completed. Results saved to {output_dir}")
+    return merged_output_file
+
+# Main execution
+if __name__ == "__main__":
+    run_evaluation_pipeline()

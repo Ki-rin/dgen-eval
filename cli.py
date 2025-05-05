@@ -30,14 +30,14 @@ def parse_args():
     parser.add_argument(
         "--yaml-dir", 
         type=str, 
-        default="./",
+        default="./config",
         help="Directory containing YAML files with questions"
     )
     
     parser.add_argument(
         "--md-dir", 
         type=str, 
-        default="./",
+        default="./examples",
         help="Directory containing markdown files with ODD documentation"
     )
     
@@ -66,6 +66,14 @@ def parse_args():
         "--config", 
         type=str,
         help="Path to a configuration YAML file"
+    )
+
+    parser.add_argument(
+        "--output-format",
+        type=str,
+        default="csv",
+        choices=["csv"],
+        help="Output format for evaluation results (currently only CSV is supported)"
     )
     
     return parser.parse_args()
@@ -120,15 +128,18 @@ def main():
     print(f"  Output directory: {output_dir}")
     print(f"  Prompt file: {prompt_file}")
     print(f"  Section range: {section_range}")
+    print(f"  Output format: CSV")
     
     # Run the evaluation pipeline
-    run_evaluation_pipeline(
+    result_file = run_evaluation_pipeline(
         yaml_dir=yaml_dir,
         md_dir=md_dir,
         output_dir=output_dir,
         prompt_file=prompt_file,
         section_range=section_range
     )
+    
+    print(f"Evaluation complete. Final results saved to: {result_file}")
 
 if __name__ == "__main__":
     main()

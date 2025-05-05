@@ -1,0 +1,185 @@
+Section #,Section,Question,Requirements,Answer,Coherence/Clarity Score,Quality Score,Capture Rate,Hallucination Score
+1,"Object Scope, Purpose, and Use","Describe the overall scope, purpose, and intended use of the AI component or module.
+","Provide clear information about Object Scope, Purpose, and Use
+Address all aspects mentioned in the question",This AI component is designed to classify customer support tickets automatically.,0.85,0.85,0.85,0.85
+1,1.1. Objectives and Business Purpose,"Describe the objectives and business purpose of the AI component or module.
+Evaluate and justify the applicability of the selected AI/ML approach against business objectives and the use of the AI component. 
+Specifically, consider the following:
+  - The AI component needs to generate adverse action reasons.
+  - Certain business drivers (inputs) are expected to have specific functional relationships with the output, such as a variable's key role in clustering.
+  - The output is subject to fairness concerns (e.g., Fair Lending).
+  - The business use case is subject to system or data limitations.
+  - The AI component's use has a large customer/client/employee base or a significant impact on customers/clients/employees.
+","Provide clear information about 1.1. Objectives and Business Purpose
+Address all aspects mentioned in the question","The primary objective is to reduce manual ticket routing time by 80%.
+This AI classification system aligns with our customer-first strategy by ensuring
+timely resolution of support issues. The ML approach was selected because of the
+large volume of historical ticket data available.",0.85,0.85,0.85,0.85
+1,"1.2. Business Scope of the Object, Product/ Portfolio Description","Provide an overview of the product, portfolio, or population to which the AI component will be applied.
+Include any regulatory, self-identified, audit, or other issues, including Corrective Action Plans (CAPs), to which the AI component is subject.
+","Provide clear information about 1.2. Business Scope of the Object, Product/ Portfolio Description
+Address all aspects mentioned in the question","This system will be applied to all incoming customer support tickets across
+our enterprise product suite. The system is subject to regular audit reviews
+and must comply with our internal data privacy guidelines.",0.85,0.85,0.85,0.85
+2,Data Scope and Feature Engineering,"Describe the data sources and scope for the AI component.
+","Provide clear information about Data Scope and Feature Engineering
+Address all aspects mentioned in the question","This AI component utilizes a comprehensive dataset of over 1.5 million customer support tickets collected from our enterprise ticketing system. The data spans multiple product lines and service categories, providing a robust foundation for accurate classification.",0.85,0.85,0.85,0.85
+2,2.1. Data Sources and Collection,"Describe the data sources used for developing the AI component:
+- What are the key data sources?
+- How are they collected and preprocessed?
+- What is the time period covered by the data?
+- What is the data refresh frequency?
+","Provide clear information about 2.1. Data Sources and Collection
+Address all aspects mentioned in the question","The primary data sources for this AI classification system include:
+
+- **Zendesk Ticketing System**: Historical customer support tickets from the past 3 years (2022-2025)
+- **Internal Knowledge Base**: Structured metadata about products, services, and common issues
+- **Customer Feedback Database**: Post-resolution satisfaction surveys and feedback
+
+Data collection is automated through our ETL pipeline, which extracts new tickets daily at 2:00 AM. The pipeline performs initial cleaning and standardization, including:
+
+- Removal of personally identifiable information (PII)
+- Standardization of text formatting and encoding
+- Language detection and filtering (English-only for initial model)
+- Extraction of metadata (timestamps, product identifiers, initial urgency ratings)
+
+The dataset is refreshed daily with incremental updates, with full retraining performed quarterly.",0.85,0.85,0.85,0.85
+2,2.2. Feature Engineering and Selection,"Explain the feature engineering process:
+- What are the key features used in the model?
+- How were features engineered and selected?
+- What techniques were used for feature selection?
+- How were features validated for relevance?
+","Provide clear information about 2.2. Feature Engineering and Selection
+Address all aspects mentioned in the question","Feature engineering was conducted through a multi-stage process:
+
+1. **Text Processing**:
+
+   - Tokenization and normalization of ticket content
+   - Stop word removal and lemmatization
+   - N-gram extraction (unigrams, bigrams, and trigrams)
+   - TF-IDF (Term Frequency-Inverse Document Frequency) transformation
+
+2. **Metadata Incorporation**:
+
+   - One-hot encoding of categorical variables (product line, customer segment)
+   - Time-based features (hour of day, day of week, month)
+   - Previous ticket history for the customer (frequency, recency)
+
+3. **Feature Selection**:
+   - Recursive Feature Elimination (RFE) to identify the most predictive features
+   - Chi-square test for categorical feature importance
+   - Correlation analysis to remove redundant features
+   - Domain expert validation of selected features
+
+The final feature set consists of 240 text-based features and 35 metadata features. Feature selection was guided by classification performance metrics, with a focus on minimizing false negatives for critical issue categories.",0.85,0.85,0.85,0.85
+2,2.3. Data Quality Checks,"Detail the data quality processes:
+- What data quality checks are performed?
+- How are missing values handled?
+- What outlier detection methods are used?
+- How are data distributions monitored?
+","Provide clear information about 2.3. Data Quality Checks
+Address all aspects mentioned in the question","The data pipeline includes the following quality checks:
+
+1. **Completeness Checks**:
+
+   - Missing value detection for all required fields
+   - Threshold alerts when missing values exceed 2% of daily volume
+   - Automated imputation for non-critical fields (using mode for categorical, mean for numerical)
+
+2. **Consistency Validation**:
+
+   - Range checks for numerical fields
+   - Format validation for structured fields (dates, IDs, etc.)
+   - Cross-field validation rules for mutually dependent fields
+
+3. **Outlier Detection**:
+
+   - Z-score method for numerical features (threshold: ±3σ)
+   - Isolation Forest for multivariate outlier detection
+   - Flagging of tickets with unusual patterns for manual review
+
+4. **Distribution Monitoring**:
+   - Daily monitoring of feature distributions
+   - Kolmogorov-Smirnov test to detect distribution shifts
+   - Alerting when distribution shifts exceed predetermined thresholds
+
+Data quality metrics are tracked in a dedicated dashboard with automated alerts for significant deviations. A dedicated Data Quality team reviews flagged issues daily and implements corrective actions when necessary.",0.85,0.85,0.85,0.85
+3,Model Development,"Provide an overview of the model development process.
+","Provide clear information about Model Development
+Address all aspects mentioned in the question",Our ticket classification system employs a hybrid approach combining natural language processing and traditional machine learning techniques to achieve high accuracy across diverse ticket types.,0.85,0.85,0.85,0.85
+3,3.1. Model Architecture,"Describe the model architecture and technical details:
+- What type of model is used?
+- Why was this architecture chosen?
+- What are the key hyperparameters?
+- How was the architecture validated?
+","Provide clear information about 3.1. Model Architecture
+Address all aspects mentioned in the question","The classification system employs a two-stage architecture:
+
+1. **Stage 1: Text Embedding Generation**
+
+   - Fine-tuned BERT model (bert-base-uncased)
+   - Custom layers trained on our support ticket corpus
+   - Output: 768-dimensional contextual embeddings
+
+2. **Stage 2: Multi-class Classification**
+   - Gradient Boosting Decision Tree (XGBoost)
+   - Hyperparameters:
+     - max_depth: 6
+     - learning_rate: 0.1
+     - n_estimators: 200
+     - subsample: 0.8
+     - colsample_bytree: 0.8
+
+This hybrid architecture was selected after benchmarking against several alternatives:
+
+- Pure transformer-based approach (BERT with classification head)
+- Traditional ML with TF-IDF features
+- Ensemble methods with various feature combinations
+
+The hybrid approach outperformed alternatives by approximately 8% in overall accuracy and 12% in F1-score for minority classes, while maintaining acceptable inference latency (avg. 120ms per ticket).",0.85,0.85,0.85,0.85
+3,3.2. Training Methodology,"Explain the training methodology:
+- What training approach was used?
+- How was the data split for training/validation/testing?
+- What optimization techniques were employed?
+- What stopping criteria were used?
+","Provide clear information about 3.2. Training Methodology
+Address all aspects mentioned in the question","The model was trained using the following methodology:
+
+1. **Data Splitting**:
+
+   - 70% training set
+   - 15% validation set
+   - 15% test set
+   - Stratified splitting to maintain class distribution
+
+2. **Training Process**:
+
+   - BERT component: Fine-tuned for 3 epochs with learning rate 2e-5
+   - XGBoost component: Trained on BERT embeddings + metadata
+   - Early stopping based on validation loss (patience: 5 epochs)
+   - Learning rate scheduling with cosine decay
+
+3. **Regularization Techniques**:
+
+   - Dropout (rate: 0.2) in BERT layers
+   - L2 regularization in XGBoost (lambda: 1.0)
+   - Class weights adjusted for imbalanced classes
+
+4. **Infrastructure**:
+   - Training performed on 4x NVIDIA A100 GPUs
+   - Distributed training using Horovod
+   - Mixed precision training (FP16) for efficiency
+
+The training process was logged using MLflow, with all hyperparameters, metrics, and model artifacts stored for reproducibility and compliance purposes.",0.85,0.85,0.85,0.85
+3,3.3. Model Evaluation,"Detail the model evaluation process:
+- What metrics were used to evaluate the model?
+- How was model performance assessed across different segments?
+- What benchmarks or alternatives were considered?
+- How was fairness evaluated?
+","Provide clear information about 3.3. Model Evaluation
+Address all aspects mentioned in the question","The model was evaluated using a comprehensive set of metrics:
+
+1. **Classification Performance**:
+   - Accuracy: 92.3% overall
+   - Precision: 89.7% (macro), 94.1% (weighted)
+   - Recall: 87.2% (macro), 92.3%",0.85,0.85,0.85,0.85

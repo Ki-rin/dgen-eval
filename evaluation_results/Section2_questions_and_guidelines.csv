@@ -1,0 +1,25 @@
+Section,Question,Requirements,Answer,Coherence/Clarity Score,Quality Score,Capture Rate,Hallucination Score
+Data Scope and Feature Engineering,"Describe the data sources and scope for the AI component.
+","Provide clear information about Data Scope and Feature Engineering
+Address all aspects mentioned in the question",,,,,
+2.1. Data Sources and Collection,"Describe the data sources used for developing the AI component:
+- What are the key data sources?
+- How are they collected and preprocessed?
+- What is the time period covered by the data?
+- What is the data refresh frequency?
+","Provide clear information about 2.1. Data Sources and Collection
+Address all aspects mentioned in the question",,,,,
+2.2. Feature Engineering and Selection,"Explain the feature engineering process:
+- What are the key features used in the model?
+- How were features engineered and selected?
+- What techniques were used for feature selection?
+- How were features validated for relevance?
+","Provide clear information about 2.2. Feature Engineering and Selection
+Address all aspects mentioned in the question",,,,,
+2.3. Data Quality Checks,"Detail the data quality processes:
+- What data quality checks are performed?
+- How are missing values handled?
+- What outlier detection methods are used?
+- How are data distributions monitored?
+","Provide clear information about 2.3. Data Quality Checks
+Address all aspects mentioned in the question",,,,,

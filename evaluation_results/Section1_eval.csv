@@ -1,0 +1,23 @@
+Section,Question,Requirements,Answer,Coherence/Clarity Score,Quality Score,Capture Rate,Hallucination Score
+"Object Scope, Purpose, and Use","Describe the overall scope, purpose, and intended use of the AI component or module.
+","Provide clear information about Object Scope, Purpose, and Use
+Address all aspects mentioned in the question",This AI component is designed to classify customer support tickets automatically.,0.85,0.85,0.85,0.85
+1.1. Objectives and Business Purpose,"Describe the objectives and business purpose of the AI component or module.
+Evaluate and justify the applicability of the selected AI/ML approach against business objectives and the use of the AI component. 
+Specifically, consider the following:
+  - The AI component needs to generate adverse action reasons.
+  - Certain business drivers (inputs) are expected to have specific functional relationships with the output, such as a variable's key role in clustering.
+  - The output is subject to fairness concerns (e.g., Fair Lending).
+  - The business use case is subject to system or data limitations.
+  - The AI component's use has a large customer/client/employee base or a significant impact on customers/clients/employees.
+","Provide clear information about 1.1. Objectives and Business Purpose
+Address all aspects mentioned in the question","The primary objective is to reduce manual ticket routing time by 80%.
+This AI classification system aligns with our customer-first strategy by ensuring
+timely resolution of support issues. The ML approach was selected because of the
+large volume of historical ticket data available.",0.85,0.85,0.85,0.85
+"1.2. Business Scope of the Object, Product/ Portfolio Description","Provide an overview of the product, portfolio, or population to which the AI component will be applied.
+Include any regulatory, self-identified, audit, or other issues, including Corrective Action Plans (CAPs), to which the AI component is subject.
+","Provide clear information about 1.2. Business Scope of the Object, Product/ Portfolio Description
+Address all aspects mentioned in the question","This system will be applied to all incoming customer support tickets across
+our enterprise product suite. The system is subject to regular audit reviews
+and must comply with our internal data privacy guidelines.",0.85,0.85,0.85,0.85

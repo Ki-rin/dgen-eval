@@ -10,7 +10,7 @@ This tool provides an end-to-end pipeline for evaluating documentation quality u
 - **Multiple Evaluation Metrics**: Score coherence, quality, capture rate, and hallucination detection
 - **Modular Architecture**: Easily extensible to new document types and evaluation criteria
 - **Parallel Processing**: Efficient processing of multiple documents and sections
-- **Excel Report Generation**: Detailed reports with scores and feedback
+- **CSV Report Generation**: Detailed reports with scores and feedback
 
 ## Directory Structure
 
@@ -28,9 +28,9 @@ This tool provides an end-to-end pipeline for evaluating documentation quality u
 │   ├── ODD_Section_2_short.md
 │   └── ...
 └── evaluation_results/         # Output directory for results
-    ├── Section1_eval.xlsx
-    ├── Section2_eval.xlsx
-    └── merged_evaluation.xlsx
+    ├── Section1_eval.csv
+    ├── Section2_eval.csv
+    └── merged_evaluation.csv
 ```
 
 ## Installation
@@ -83,6 +83,7 @@ Options:
 - `--prompt-file`: Path to evaluation prompts YAML file (default: "./prompts.yaml")
 - `--section-range`: Range of sections to evaluate (e.g., '1-5' or '2-3') (default: "1-5")
 - `--config`: Path to a configuration YAML file (optional)
+- `--output-format`: Output format for results (currently only CSV is supported)
 
 ### Configuration Files
 
@@ -165,6 +166,14 @@ The modular design makes it easy to extend the tool for other document types:
 1. Create new YAML files for your document sections
 2. Modify the extraction logic if needed
 3. Update evaluation prompts for domain-specific criteria
+
+## Working with CSV Data
+
+All evaluation results are now saved in CSV format, which provides better compatibility with various data analysis tools and simplifies version control. You can:
+
+- Open CSV files directly in Excel, Google Sheets, or any spreadsheet application
+- Process results programmatically using pandas or other data libraries
+- Easily integrate with other data pipelines and visualization tools
 
 ## License
 
