@@ -78,7 +78,7 @@ Clean this Markdown by:
 Original:
 {content}
 
-Return ONLY the cleaned markdown content without any code block wrappers or explanations.
+Return only the cleaned markdown content. Do NOT wrap your response in markdown code blocks (```markdown). Return the raw markdown content directly.
 """
         elif file_path.suffix.lower() == '.json':
             return f"""
@@ -94,40 +94,10 @@ Clean this MRM JSON configuration for RAG/API-based models:
 Original:
 {content}
 
-Return ONLY the cleaned JSON content without any code block wrappers or explanations.
+Return only the cleaned JSON content. Do NOT wrap your response in code blocks (```json). Return the raw JSON content directly.
 """
         else:
-            return f"Clean this MRM documentation by removing fluff and fixing contradictions:\n{content}"
-    
-    def clean_file_content(self, file_path: Path, content: str) -> str:
-        """Clean content using LLM."""
-        try:
-            prompt = self.get_cleaning_prompt(file_path, content)
-            
-            # Try LLM call with retries
-            for attempt in range(3):
-                try:
-                    cleaned = dgen_generate_content(
-                        prompt=prompt,
-                        content=content,
-                        temperature=self.temperature
-                    )
-                    
-                    # Remove markdown wrapper if present
-                    cleaned = self.remove_markdown_wrapper(cleaned, file_path)
-                    
-                    logger.info(f"Cleaned: {file_path.name}")
-                    return cleaned
-                except Exception as e:
-                    if attempt < 2:
-                        logger.warning(f"Retry {attempt + 1} for {file_path.name}: {e}")
-                        time.sleep(1)
-                    else:
-                        raise
-                        
-        except Exception as e:
-            logger.error(f"Failed to clean {file_path.name}: {e}")
-            return f"# Error during cleaning: {str(e)}\n# Original content:\n{content}"
+            return f"Clean this MRM documentation by removing fluff and fixing contradictions. Do NOT wrap your response in code blocks. Return the raw content directly:\n{content}"
     
     def remove_markdown_wrapper(self, content: str, file_path: Path) -> str:
         """Remove markdown code block wrappers from LLM output."""
@@ -149,6 +119,36 @@ Return ONLY the cleaned JSON content without any code block wrappers or explanat
             logger.debug(f"Removed markdown wrapper from {file_path.name}")
         
         return content.strip()
+
+    def clean_file_content(self, file_path: Path, content: str) -> str:
+        """Clean content using LLM."""
+        try:
+            prompt = self.get_cleaning_prompt(file_path, content)
+            
+            # Try LLM call with retries
+            for attempt in range(3):
+                try:
+                    cleaned = dgen_generate_content(
+                        prompt=prompt,
+                        content=content,
+                        temperature=self.temperature
+                    )
+                    
+                    # Remove markdown wrappers before saving
+                    cleaned = self.remove_markdown_wrapper(cleaned, file_path)
+                    
+                    logger.info(f"Cleaned: {file_path.name}")
+                    return cleaned
+                except Exception as e:
+                    if attempt < 2:
+                        logger.warning(f"Retry {attempt + 1} for {file_path.name}: {e}")
+                        time.sleep(1)
+                    else:
+                        raise
+                        
+        except Exception as e:
+            logger.error(f"Failed to clean {file_path.name}: {e}")
+            return f"# Error during cleaning: {str(e)}\n# Original content:\n{content}"
     
     def should_process_file(self, file_path: Path) -> bool:
         """Only process .json and .md files."""
