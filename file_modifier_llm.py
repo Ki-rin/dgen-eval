@@ -78,7 +78,7 @@ Clean this Markdown by:
 Original:
 {content}
 
-Return only the cleaned markdown.
+Return ONLY the cleaned markdown content without any code block wrappers or explanations.
 """
         elif file_path.suffix.lower() == '.json':
             return f"""
@@ -94,7 +94,7 @@ Clean this MRM JSON configuration for RAG/API-based models:
 Original:
 {content}
 
-Return only the cleaned JSON.
+Return ONLY the cleaned JSON content without any code block wrappers or explanations.
 """
         else:
             return f"Clean this MRM documentation by removing fluff and fixing contradictions:\n{content}"
@@ -112,6 +112,10 @@ Return only the cleaned JSON.
                         content=content,
                         temperature=self.temperature
                     )
+                    
+                    # Remove markdown wrapper if present
+                    cleaned = self.remove_markdown_wrapper(cleaned, file_path)
+                    
                     logger.info(f"Cleaned: {file_path.name}")
                     return cleaned
                 except Exception as e:
@@ -124,6 +128,27 @@ Return only the cleaned JSON.
         except Exception as e:
             logger.error(f"Failed to clean {file_path.name}: {e}")
             return f"# Error during cleaning: {str(e)}\n# Original content:\n{content}"
+    
+    def remove_markdown_wrapper(self, content: str, file_path: Path) -> str:
+        """Remove markdown code block wrappers from LLM output."""
+        content = content.strip()
+        
+        # Remove markdown code block wrappers
+        if content.startswith('```'):
+            lines = content.split('\n')
+            
+            # Remove opening wrapper (```markdown, ```json, ```md, etc.)
+            if lines[0].startswith('```'):
+                lines = lines[1:]
+            
+            # Remove closing wrapper
+            if lines and lines[-1].strip() == '```':
+                lines = lines[:-1]
+            
+            content = '\n'.join(lines)
+            logger.debug(f"Removed markdown wrapper from {file_path.name}")
+        
+        return content.strip()
     
     def should_process_file(self, file_path: Path) -> bool:
         """Only process .json and .md files."""
