@@ -100,23 +100,24 @@ Return only the cleaned JSON content. Do NOT wrap your response in code blocks (
             return f"Clean this MRM documentation by removing fluff and fixing contradictions. Do NOT wrap your response in code blocks. Return the raw content directly:\n{content}"
     
     def remove_markdown_wrapper(self, content: str, file_path: Path) -> str:
-        """Remove markdown code block wrappers from LLM output."""
+        """Remove markdown code block wrappers from LLM output while preserving original markdown formatting."""
         content = content.strip()
         
-        # Remove markdown code block wrappers
-        if content.startswith('```'):
+        # Only remove if the ENTIRE content is wrapped in a single code block
+        if content.startswith('```') and content.endswith('```'):
             lines = content.split('\n')
             
-            # Remove opening wrapper (```markdown, ```json, ```md, etc.)
-            if lines[0].startswith('```'):
+            # Check if it's a complete wrapper (starts with ``` and ends with ```)
+            if len(lines) >= 3 and lines[0].startswith('```') and lines[-1].strip() == '```':
+                # Remove opening wrapper line (```markdown, ```json, ```md, etc.)
                 lines = lines[1:]
-            
-            # Remove closing wrapper
-            if lines and lines[-1].strip() == '```':
-                lines = lines[:-1]
-            
-            content = '\n'.join(lines)
-            logger.debug(f"Removed markdown wrapper from {file_path.name}")
+                
+                # Remove closing wrapper line
+                if lines and lines[-1].strip() == '```':
+                    lines = lines[:-1]
+                
+                content = '\n'.join(lines)
+                logger.debug(f"Removed markdown wrapper from {file_path.name}")
         
         return content.strip()
 
